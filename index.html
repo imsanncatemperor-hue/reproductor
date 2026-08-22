@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lyrics Player</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #000; color: #fff; font-family: 'Inter', sans-serif; height: 100vh; display: flex; overflow: hidden; }
+
+    .app-container { display: flex; width: 100vw; height: 100vh; position: relative; }
+
+    .sidebar {
+      width: 340px;
+      background: rgba(12, 10, 15, 0.95);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      z-index: 10;
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar.closed { transform: translateX(-100%); }
+
+    .playlist-header {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 12px;
+    }
+    .playlist-title { font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+
+    .song-list { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; flex: 1; }
+
+    .song-item {
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .song-item:hover { background: rgba(255, 255, 255, 0.1); }
+    .song-item.active {
+      background: rgba(255, 255, 255, 0.2);
+      border-left: 4px solid #fff;
+    }
+
+    .song-info h4 { font-size: 1rem; font-weight: 600; }
+    .song-info p { font-size: 0.85rem; color: rgba(255, 255, 255, 0.6); margin-top: 2px; }
+
+    .controls-panel {
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .volume-control { display: flex; flex-direction: column; gap: 8px; }
+    .volume-label { display: flex; justify-content: space-between; font-size: 0.85rem; color: #ccc; }
+    input[type=range] { accent-color: #ffffff; width: 100%; cursor: pointer; }
+
+    .btn-toggle-menu {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 5;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+      transition: background 0.2s;
+    }
+    .btn-toggle-menu:hover { background: rgba(255, 255, 255, 0.25); }
+
+    .main-stage {
+      flex: 1;
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      transition: background 0.8s ease;
+    }
+
+    #visualCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .lyrics-container {
+      position: relative;
+      z-index: 2;
+      width: 85%;
+      max-width: 900px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .lyric-line { transition: all 0.5s ease; }
+    .lyric-prev, .lyric-next {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: rgba(255, 255, 255, 0.35);
+      font-style: italic;
+    }
+
+    .lyric-current {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.8rem;
+      font-weight: 600;
+      color: #fff;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .floating-controls {
+      position: absolute;
+      bottom: 30px;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 10px 24px;
+      border-radius: 30px;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-play {
+      background: #fff;
+      color: #000;
+      border: none;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <button class="btn-toggle-menu" id="btnToggleMenu" title="Abrir/Cerrar Lista">☰</button>
+
+    <div class="sidebar" id="sidebar">
+      <div class="playlist-header">
+        <h2 class="playlist-title">Lista de canciones</h2>
+      </div>
+      
+      <div class="song-list" id="songList"></div>
+
+      <div class="controls-panel">
+        <div class="volume-control">
+          <div class="volume-label">
+            <span>Volumen</span>
+            <span id="volValue">70</span>
+          </div>
+          <input type="range" id="volumeRange" min="0" max="100" value="70">
+        </div>
+      </div>
+    </div>
+
+    <div class="main-stage" id="mainStage">
+      <canvas id="visualCanvas"></canvas>
+
+      <div class="lyrics-container">
+        <div class="lyric-line lyric-prev" id="lyricPrev">...</div>
+        <div class="lyric-line lyric-current" id="lyricCurrent">...</div>
+        <div class="lyric-line lyric-next" id="lyricNext">...</div>
+      </div>
+
+      <div class="floating-controls">
+        <button class="btn-play" id="btnPlay">▶</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const audio = new Audio();
+    let currentSongIndex = -1;
+    let animationFrameId = null;
+
+    const GITHUB_USER = "imsanncatemperor-hue";
+    const REPO_NAME = "mi-reproductor";
+    const BASE_URL = `https://${GITHUB_USER}.github.io/${REPO_NAME}/`;
+
+    const songsDatabase = [
+      {
+        title: "Lover Is Day",
+        artist: "Cuco",
+        audioUrl: BASE_URL + "lover-is-day.mp3",
+        theme: "hearts",
+        bgStyle: "radial-gradient(circle at center, #3b0764 0%, #090314 100%)",
+        lyrics: [
+          { time: 0, text: "Time changed, we're different" },
+          { time: 3, text: "But my mind still says redundant things, can I not think?" },
+          { time: 7, text: "Will you love this part of me?" },
+          { time: 10, text: "My lover is a day I can't forget" },
+          { time: 14, text: "Furthering my distance from you" },
+          { time: 17, text: "Realistically, I can't leave now" },
+          { time: 20, text: "But I'm okay as long as you keep me from going crazy" }
+        ]
+      },
+      {
+        title: "Spit In My Face!",
+        artist: "ThxSoMch",
+        audioUrl: BASE_URL + "spit-in-my-face.mp3",
+        theme: "sparks",
+        bgStyle: "radial-gradient(circle at center, #881337 0%, #050002 100%)",
+        lyrics: [
+          { time: 0, text: "Spit in my face my love, you won't phase me" },
+          { time: 3, text: "Spit in my face my love, it won't change me" },
+          { time: 6, text: "Spit in my face my love, I've gone crazy" },
+          { time: 9, text: "Spit in my face my love, I've gone mad" }
+        ]
+      },
+      {
+        title: "Francés Limón",
+        artist: "Los Enanitos Verdes",
+        audioUrl: BASE_URL + "frances-limon.mp3",
+        theme: "lemons",
+        bgStyle: "radial-gradient(circle at center, #713f12 0%, #0a0500 100%)",
+        lyrics: [
+          { time: 0, text: "(La, la, la, la, la, la, la, la, la, la, la, la)" },
+          { time: 12, text: "Todo tiene el color" },
+          { time: 15, text: "De tus ojos, cómo ves" },
+          { time: 18, text: "Todo cambia, no así, tu voz" },
+          { time: 22, text: "Cuando me hablas en francés limón" }
+        ]
+      },
+      {
+        title: "Termonuclear",
+        artist: "Perfecto Miserable",
+        audioUrl: BASE_URL + "termonuclear.mp3",
+        theme: "nuclear",
+        bgStyle: "radial-gradient(circle at center, #14532d 0%, #010a04 100%)",
+        lyrics: [
+          { time: 0, text: "Mataría a mis amigos" },
+          { time: 3, text: "Por una tarde contigo" },
+          { time: 6, text: "Un ataque termonuclear" }
+        ]
+      }
+    ];
+
+    const songListContainer = document.getElementById('songList');
+    songsDatabase.forEach((song, i) => {
+      const item = document.createElement('div');
+      item.className = 'song-item';
+      item.innerHTML = `
+        <div class="song-info">
+          <h4>${song.title}</h4>
+          <p>${song.artist}</p>
+        </div>
+      `;
+      item.onclick = () => selectSong(i);
+      songListContainer.appendChild(item);
+    });
+
+    const sidebar = document.getElementById('sidebar');
+    document.getElementById('btnToggleMenu').onclick = () => {
+      sidebar.classList.toggle('closed');
+    };
+
+    function selectSong(index) {
+      currentSongIndex = index;
+      document.querySelectorAll('.song-item').forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+      });
+
+      const song = songsDatabase[index];
+      document.getElementById('mainStage').style.background = song.bgStyle;
+
+      sidebar.classList.add('closed');
+
+      audio.pause();
+      audio.src = song.audioUrl;
+      audio.currentTime = 0;
+      audio.play().then(() => {
+        document.getElementById('btnPlay').textContent = '⏸';
+      }).catch(err => console.log("Carga diferida:", err));
+
+      startVisualTheme(song.theme);
+      updateLyrics(0);
+    }
+
+    function updateLyrics(time) {
+      if (currentSongIndex === -1) return;
+      const lyrics = songsDatabase[currentSongIndex].lyrics;
+      let idx = lyrics.findIndex((item, i) => {
+        const nextTime = lyrics[i + 1] ? lyrics[i + 1].time : Infinity;
+        return time >= item.time && time < nextTime;
+      });
+
+      if (idx !== -1) {
+        document.getElementById('lyricPrev').textContent = idx > 0 ? lyrics[idx - 1].text : '';
+        document.getElementById('lyricCurrent').textContent = lyrics[idx].text;
+        document.getElementById('lyricNext').textContent = idx < lyrics.length - 1 ? lyrics[idx + 1].text : '';
+      }
+    }
+
+    audio.ontimeupdate = () => updateLyrics(audio.currentTime);
+
+    document.getElementById('btnPlay').onclick = () => {
+      if (currentSongIndex === -1) selectSong(0);
+      else if (audio.paused) {
+        audio.play();
+        document.getElementById('btnPlay').textContent = '⏸';
+      } else {
+        audio.pause();
+        document.getElementById('btnPlay').textContent = '▶';
+      }
+    };
+
+    document.getElementById('volumeRange').oninput = (e) => {
+      audio.volume = e.target.value / 100;
+      document.getElementById('volValue').textContent = e.target.value;
+    };
+
+    const canvas = document.getElementById('visualCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function startVisualTheme(type) {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      particles = [];
+      const count = 35;
+
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 15 + 10,
+          speedY: Math.random() * 1.5 + 0.5,
+          speedX: (Math.random() - 0.5) * 1,
+          opacity: Math.random() * 0.7 + 0.3
+        });
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach(p => {
+          ctx.globalAlpha = p.opacity;
+
+          if (type === 'hearts') {
+            ctx.fillStyle = '#f472b6';
+            ctx.font = `${p.size}px serif`;
+            ctx.fillText('♥', p.x, p.y);
+            p.y -= p.speedY;
+            if (p.y < -20) p.y = canvas.height + 20;
+
+          } else if (type === 'sparks') {
+            ctx.fillStyle = '#f43f5e';
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size / 3, 0, Math.PI * 2);
+            ctx.fill();
+            p.y += p.speedY * 2;
+            p.x += (Math.random() - 0.5) * 3;
+            if (p.y > canvas.height + 10) p.y = -10;
+
+          } else if (type === 'lemons') {
+            ctx.fillStyle = '#facc15';
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
+            ctx.fill();
+            p.y -= p.speedY * 0.7;
+            if (p.y < -10) p.y = canvas.height + 10;
+
+          } else if (type === 'nuclear') {
+            ctx.fillStyle = '#4ade80';
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size / 2.5, 0, Math.PI * 2);
+            ctx.fill();
+            p.y += (Math.random() - 0.5) * 2;
+            p.x += (Math.random() - 0.5) * 2;
+          }
+        });
+
+        animationFrameId = requestAnimationFrame(animate);
+      }
+      animate();
+    }
+  </script>
+</body>
+</html>
