@@ -431,12 +431,20 @@
 
       sidebar.classList.add('closed');
 
+      // Limpieza y reseteo del elemento de audio para evitar bloqueos
       audio.pause();
+      audio.src = "";
+      audio.load();
+
       audio.src = song.audioUrl;
-      audio.currentTime = 0;
+      audio.load();
+
       audio.play().then(() => {
         document.getElementById('btnPlay').textContent = '⏸';
-      }).catch(err => console.log("Carga diferida:", err));
+      }).catch(err => {
+        console.log("Reproducción bloqueada o pendiente de interacción:", err);
+        document.getElementById('btnPlay').textContent = '▶';
+      });
 
       startVisualTheme(song.theme);
       updateLyrics(0);
@@ -462,8 +470,9 @@
     document.getElementById('btnPlay').onclick = () => {
       if (currentSongIndex === -1) selectSong(0);
       else if (audio.paused) {
-        audio.play();
-        document.getElementById('btnPlay').textContent = '⏸';
+        audio.play().then(() => {
+          document.getElementById('btnPlay').textContent = '⏸';
+        }).catch(err => console.log("Error al reproducir:", err));
       } else {
         audio.pause();
         document.getElementById('btnPlay').textContent = '▶';
