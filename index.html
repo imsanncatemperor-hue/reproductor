@@ -211,11 +211,12 @@
     const REPO_NAME = "reproductor";
     const BASE_URL = `https://${GITHUB_USER}.github.io/${REPO_NAME}/`;
 
+    // Usamos encodeURIComponent para que los nombres con símbolos o espacios funcionen perfecto en la web
     const songsDatabase = [
       {
         title: "Lover Is a Day",
         artist: "Cuco",
-        audioUrl: BASE_URL + "Lover_is_a_Day.mp3",
+        audioUrl: BASE_URL + encodeURIComponent("Lover_is_a_Day.mp3"),
         theme: "hearts",
         bgStyle: "radial-gradient(circle at center, #3b0764 0%, #090314 100%)",
         lyrics: [
@@ -290,7 +291,7 @@
       {
         title: "Spit In My Face!",
         artist: "ThxSoMch",
-        audioUrl: BASE_URL + "SPITIN_MY_FACE!.mp3",
+        audioUrl: BASE_URL + encodeURIComponent("SPITIN_MY_FACE!.mp3"),
         theme: "sparks",
         bgStyle: "radial-gradient(circle at center, #881337 0%, #050002 100%)",
         lyrics: [
@@ -351,7 +352,7 @@
       {
         title: "Francés Limón",
         artist: "Los Enanitos Verdes",
-        audioUrl: BASE_URL + "Frances_Limon.mp3",
+        audioUrl: BASE_URL + encodeURIComponent("Frances_Limon.mp3"),
         theme: "lemons",
         bgStyle: "radial-gradient(circle at center, #713f12 0%, #0a0500 100%)",
         lyrics: [
@@ -390,7 +391,7 @@
       {
         title: "Termonuclear",
         artist: "Perfecto Miserable",
-        audioUrl: BASE_URL + "Termonuclear.mp3",
+        audioUrl: BASE_URL + encodeURIComponent("Termonuclear.mp3"),
         theme: "nuclear",
         bgStyle: "radial-gradient(circle at center, #14532d 0%, #010a04 100%)",
         lyrics: [
@@ -431,7 +432,6 @@
 
       sidebar.classList.add('closed');
 
-      // Limpieza y reseteo del elemento de audio para evitar bloqueos
       audio.pause();
       audio.src = "";
       audio.load();
