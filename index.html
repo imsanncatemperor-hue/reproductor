@@ -32,10 +32,7 @@
 
     .sidebar.closed { transform: translateX(-100%); }
 
-    .playlist-header {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding-bottom: 12px;
-    }
+    .playlist-header { border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 12px; }
     .playlist-title { font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
 
     .song-list { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; flex: 1; }
@@ -49,119 +46,57 @@
     }
 
     .song-item:hover { background: rgba(255, 255, 255, 0.1); }
-    .song-item.active {
-      background: rgba(255, 255, 255, 0.2);
-      border-left: 4px solid #fff;
-    }
+    .song-item.active { background: rgba(255, 255, 255, 0.2); border-left: 4px solid #fff; }
 
     .song-info h4 { font-size: 1rem; font-weight: 600; }
     .song-info p { font-size: 0.85rem; color: rgba(255, 255, 255, 0.6); margin-top: 2px; }
 
-    .controls-panel {
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: 16px;
-      padding: 16px;
-    }
-
+    .controls-panel { background: rgba(255, 255, 255, 0.04); border-radius: 16px; padding: 16px; }
     .volume-control { display: flex; flex-direction: column; gap: 8px; }
     .volume-label { display: flex; justify-content: space-between; font-size: 0.85rem; color: #ccc; }
     input[type=range] { accent-color: #ffffff; width: 100%; cursor: pointer; }
 
     .btn-toggle-menu {
       position: absolute;
-      top: 20px;
-      left: 20px;
-      z-index: 5;
+      top: 20px; left: 20px; z-index: 5;
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #fff;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      font-size: 1.2rem;
-      cursor: pointer;
-      backdrop-filter: blur(5px);
-      transition: background 0.2s;
+      color: #fff; width: 44px; height: 44px;
+      border-radius: 50%; font-size: 1.2rem; cursor: pointer;
+      backdrop-filter: blur(5px); transition: background 0.2s;
     }
     .btn-toggle-menu:hover { background: rgba(255, 255, 255, 0.25); }
 
     .main-stage {
-      flex: 1;
-      width: 100vw;
-      height: 100vh;
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #000;
-      transition: background 0.8s ease;
+      flex: 1; width: 100vw; height: 100vh; position: relative;
+      display: flex; justify-content: center; align-items: center;
+      background: #000; transition: background 0.8s ease;
     }
 
-    #visualCanvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 1;
-    }
+    #visualCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
 
     .lyrics-container {
-      position: relative;
-      z-index: 2;
-      width: 85%;
-      max-width: 900px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
+      position: relative; z-index: 2; width: 85%; max-width: 900px;
+      text-align: center; display: flex; flex-direction: column; gap: 24px;
     }
 
     .lyric-line { transition: all 0.5s ease; }
-    .lyric-prev, .lyric-next {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem;
-      color: rgba(255, 255, 255, 0.35);
-      font-style: italic;
-    }
-
+    .lyric-prev, .lyric-next { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: rgba(255, 255, 255, 0.35); font-style: italic; }
     .lyric-current {
-      font-family: 'Playfair Display', serif;
-      font-size: 2.8rem;
-      font-weight: 600;
-      color: #fff;
-      text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
-      min-height: 100px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 600;
+      color: #fff; text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+      min-height: 100px; display: flex; align-items: center; justify-content: center;
     }
 
     .floating-controls {
-      position: absolute;
-      bottom: 30px;
-      z-index: 2;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      background: rgba(0, 0, 0, 0.4);
-      padding: 10px 24px;
-      border-radius: 30px;
-      backdrop-filter: blur(8px);
+      position: absolute; bottom: 30px; z-index: 2;
+      display: flex; align-items: center; gap: 16px;
+      background: rgba(0, 0, 0, 0.4); padding: 10px 24px;
+      border-radius: 30px; backdrop-filter: blur(8px);
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .btn-play {
-      background: #fff;
-      color: #000;
-      border: none;
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      font-size: 1.3rem;
-      cursor: pointer;
-    }
+    .btn-play { background: #fff; color: #000; border: none; width: 48px; height: 48px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -204,18 +139,15 @@
 
   <script>
     const audio = new Audio();
+    audio.preload = "auto";
     let currentSongIndex = -1;
     let animationFrameId = null;
-
-    const GITHUB_USER = "imsanncatemperor-hue";
-    const REPO_NAME = "reproductor";
-    const BASE_URL = `https://${GITHUB_USER}.github.io/${REPO_NAME}/`;
 
     const songsDatabase = [
       {
         title: "Lover Is a Day",
         artist: "Cuco",
-        audioUrl: BASE_URL + "loverisaday.mp3",
+        audioUrl: "loverisaday.mp3",
         theme: "hearts",
         bgStyle: "radial-gradient(circle at center, #3b0764 0%, #090314 100%)",
         lyrics: [
@@ -290,7 +222,7 @@
       {
         title: "Spit In My Face!",
         artist: "ThxSoMch",
-        audioUrl: BASE_URL + "spitinmyface.mp3",
+        audioUrl: "spitinmyface.mp3",
         theme: "sparks",
         bgStyle: "radial-gradient(circle at center, #881337 0%, #050002 100%)",
         lyrics: [
@@ -351,7 +283,7 @@
       {
         title: "Francés Limón",
         artist: "Los Enanitos Verdes",
-        audioUrl: BASE_URL + "franceslimon.mp3",
+        audioUrl: "franceslimon.mp3",
         theme: "lemons",
         bgStyle: "radial-gradient(circle at center, #713f12 0%, #0a0500 100%)",
         lyrics: [
@@ -390,7 +322,7 @@
       {
         title: "Termonuclear",
         artist: "Perfecto Miserable",
-        audioUrl: BASE_URL + "termonuclear.mp3",
+        audioUrl: "termonuclear.mp3",
         theme: "nuclear",
         bgStyle: "radial-gradient(circle at center, #14532d 0%, #010a04 100%)",
         lyrics: [
@@ -428,20 +360,16 @@
 
       const song = songsDatabase[index];
       document.getElementById('mainStage').style.background = song.bgStyle;
-
       sidebar.classList.add('closed');
 
       audio.pause();
-      audio.src = "";
-      audio.load();
-
       audio.src = song.audioUrl;
       audio.load();
 
       audio.play().then(() => {
         document.getElementById('btnPlay').textContent = '⏸';
       }).catch(err => {
-        console.log("Reproducción bloqueada o pendiente de interacción:", err);
+        console.warn("Reproducción detenida por políticas del navegador:", err);
         document.getElementById('btnPlay').textContent = '▶';
       });
 
@@ -467,8 +395,9 @@
     audio.ontimeupdate = () => updateLyrics(audio.currentTime);
 
     document.getElementById('btnPlay').onclick = () => {
-      if (currentSongIndex === -1) selectSong(0);
-      else if (audio.paused) {
+      if (currentSongIndex === -1) {
+        selectSong(0);
+      } else if (audio.paused) {
         audio.play().then(() => {
           document.getElementById('btnPlay').textContent = '⏸';
         }).catch(err => console.log("Error al reproducir:", err));
@@ -522,16 +451,13 @@
             ctx.fillText('♥', p.x, p.y);
             p.y -= p.speedY;
             if (p.y < -20) p.y = canvas.height + 20;
-
           } else if (type === 'sparks') {
             ctx.fillStyle = '#f43f5e';
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.size / 3, 0, Math.PI * 2);
             ctx.fill();
             p.y += p.speedY * 2;
-            p.x += (Math.random() - 0.5) * 3;
             if (p.y > canvas.height + 10) p.y = -10;
-
           } else if (type === 'lemons') {
             ctx.fillStyle = '#facc15';
             ctx.beginPath();
@@ -539,7 +465,6 @@
             ctx.fill();
             p.y -= p.speedY * 0.7;
             if (p.y < -10) p.y = canvas.height + 10;
-
           } else if (type === 'nuclear') {
             ctx.fillStyle = '#4ade80';
             ctx.beginPath();
